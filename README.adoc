@@ -1,0 +1,39 @@
+= Advent Of Code 2023
+:nofooter:
+
+////
+Generate html of this readme using asciidoctor (https://docs.asciidoctor.org/asciidoctor/latest/):
+asciidoctor README.adoc 
+////
+
+My solutions for the https://adventofcode.com/2023[AoC puzzles 2023]. AoC is a
+Christmas themed coding event that takes place each December. Using it to learn
+a language or refresh general knowledge is a popular AoC activity.
+
+This year I will solve the problems using one of the following languages each
+day e. g. Day 1 => C#, Day 2 => Rust and so on, looping back to C# after Python.
+
+.Languages
+- C#
+- Rust
+- C++
+- JavaScript
+- Java
+- Python 
+
+== Solution Overview
+
+[cols="1,1,1,1"]
+|===
+| Day | Language | Part 1 | Part 2
+
+| 0
+| None
+| Y
+| Y
+|===
+
+== Instructions for running
+
+TODO: Write instructions for running the solutions (for each language)
+
