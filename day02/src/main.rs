@@ -144,7 +144,36 @@ mod solution {
     }
 
     pub fn part_two(input: &str) -> i32 {
-        0
+        let games: Vec<Game> = input
+            .lines()
+            .map(str::parse)
+            .collect::<Result<_, _>>()
+            .expect("Parsing the puzzle input failed");
+
+        games
+            .into_iter()
+            .map(|game| {
+                let mut biggest_red = 1;
+                let mut biggest_green = 1;
+                let mut biggest_blue = 1;
+
+                for pull in game.pulls.into_iter() {
+                    if pull.red > biggest_red {
+                        biggest_red = pull.red;
+                    }
+
+                    if pull.green > biggest_green {
+                        biggest_green = pull.green;
+                    }
+
+                    if pull.blue > biggest_blue {
+                        biggest_blue = pull.blue;
+                    }
+                }
+
+                biggest_red * biggest_green * biggest_blue
+            })
+            .sum()
     }
 }
 
