@@ -1,6 +1,7 @@
 fn main() {
     let input = include_str!("../../input/Day02.txt");
     println!("Solution for part one: {}", solution::part_one(input));
+    println!("Solution for part two: {}", solution::part_two(input));
 }
 
 mod solution {
@@ -141,20 +142,29 @@ mod solution {
 
         valid_games.into_iter().sum()
     }
+
+    pub fn part_two(input: &str) -> i32 {
+        0
+    }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
 
-    #[test]
-    fn test_part_one() {
-        let input = r#"Game 1: 3 blue, 4 red; 1 red, 2 green, 6 blue; 2 green
+    const INPUT: &str = r#"Game 1: 3 blue, 4 red; 1 red, 2 green, 6 blue; 2 green
 Game 2: 1 blue, 2 green; 3 green, 4 blue, 1 red; 1 green, 1 blue
 Game 3: 8 green, 6 blue, 20 red; 5 blue, 4 red, 13 green; 5 green, 1 red
 Game 4: 1 green, 3 red, 6 blue; 3 green, 6 red; 3 green, 15 blue, 14 red
 Game 5: 6 red, 1 blue, 3 green; 2 blue, 1 red, 2 green"#;
 
-        assert_eq!(solution::part_one(input), 8);
+    #[test]
+    fn test_part_one() {
+        assert_eq!(solution::part_one(INPUT), 8);
+    }
+
+    #[test]
+    fn test_part_two() {
+        assert_eq!(solution::part_two(INPUT), 2286);
     }
 }
