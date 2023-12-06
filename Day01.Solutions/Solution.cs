@@ -82,14 +82,71 @@ public class Solution
     ///         4nineeightseven2
     ///         zoneight234
     ///         7pqrstsixteen
-    ///         
+    ///
     ///         In this example, the calibration values are 29, 83, 13, 24, 42,
     ///         14, and 76. Adding these together produces 281.
     ///     </para>
     /// </summary
     public static int PartTwo(string input)
     {
-        return 0;
-    }
+        int sum = 0;
 
+        var lines = input.Split(
+            '\n',
+            StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries
+        );
+
+        foreach (var line in lines)
+        {
+            var nameOfNumber = (int n) =>
+                n switch
+                {
+                    1 => "one",
+                    2 => "two",
+                    3 => "three",
+                    4 => "four",
+                    5 => "five",
+                    6 => "six",
+                    7 => "seven",
+                    8 => "eight",
+                    9 => "nine",
+                    _ => ""
+                };
+
+            int? left = null;
+            int? right = null;
+
+            for (int index = 0; index < line.Length; index++)
+            {
+                if (char.IsDigit(line[index]))
+                {
+                    if (left != null)
+                        right = int.Parse(line[index].ToString());
+                    else
+                        left = int.Parse(line[index].ToString());
+
+                    continue;
+                }
+
+                for (int number = 1; number < 10; number++)
+                {
+                    if (!line[index..].StartsWith(nameOfNumber(number)))
+                        continue;
+
+                    if (left != null)
+                        right = number;
+                    else
+                        left = number;
+
+                    break;
+                }
+            }
+
+            left ??= 0;
+            right ??= left;
+            sum += int.Parse($"{left}{right}");
+        }
+
+        return sum;
+    }
 }
