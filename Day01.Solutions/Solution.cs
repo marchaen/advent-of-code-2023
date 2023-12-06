@@ -2,7 +2,6 @@ namespace Day01.Solutions;
 
 public class Solution
 {
-
     /// <summary>
     ///     Solution for the first part of day 01 of AoC. The following problem
     ///     description was given.
@@ -31,7 +30,7 @@ public class Solution
         int sum = 0;
 
         var lines = input.Split(
-            '\n', 
+            '\n',
             StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries
         );
 
@@ -71,10 +70,10 @@ public class Solution
     ///         digits are actually spelled out with letters: one, two, three,
     ///         four, five, six, seven, eight, and nine also count as valid
     ///         "digits".
-    ///         
+    ///
     ///         Equipped with this new information, you now need to find the
     ///         real first and last digit on each line. For example:
-    ///         
+    ///
     ///         two1nine
     ///         eightwothree
     ///         abcone2threexyz
