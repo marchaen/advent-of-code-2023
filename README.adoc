@@ -33,6 +33,11 @@ day e. g. Day 1 => C#, Day 2 => Rust and so on, looping back to C# after Python.
 | C#
 | Y
 | Y
+
+| 2
+| Rust
+| N
+| N
 |===
 
 == Instructions for running

@@ -5,3 +5,7 @@ README.html
 bin/
 obj/
 
+# Rust compiled files and executables
+debug/
+target/
+
