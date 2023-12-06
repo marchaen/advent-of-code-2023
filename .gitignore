@@ -1,3 +1,7 @@
 # Locally generated documentation can be replicated with README.adoc
 README.html
 
+# C# build directories
+bin/
+obj/
+
