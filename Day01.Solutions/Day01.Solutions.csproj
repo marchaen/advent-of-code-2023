@@ -7,4 +7,11 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Content
+        Include="../input/Day01.txt"
+        CopyToOutputDirectory="PreserveNewest"
+    />
+  </ItemGroup>
+
 </Project>
