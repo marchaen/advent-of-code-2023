@@ -36,7 +36,7 @@ day e. g. Day 1 => C#, Day 2 => Rust and so on, looping back to C# after Python.
 
 | 2
 | Rust
-| N
+| Y
 | N
 |===
 
@@ -52,4 +52,12 @@ The c# solutions can be run by executing one of the following two commands:
 :dotnet-8-sdk-url: https://dotnet.microsoft.com/en-us/download/dotnet/8.0
 
 NOTE: An installation of the {dotnet-8-sdk-url}[dotnet 8.0 sdk] is required.
+
+=== Rust
+
+The rust solutions can be run by executing `cargo run` in the project directory.
+
+:rustlang: https://www.rust-lang.org/tools/install
+
+NOTE: An installation of the {rustlang}[rustlang toolchain] is required.
 
