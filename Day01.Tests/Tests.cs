@@ -5,6 +5,7 @@ namespace Day01.Tests;
 [TestClass]
 public class Tests
 {
+
     [TestMethod]
     public void TestPartOne()
     {
@@ -17,4 +18,21 @@ public class Tests
 
         Assert.AreEqual(142, Solution.PartOne(input));
     }
+
+    [TestMethod]
+    public void TestPartTwo()
+    {
+        var input = """
+            two1nine
+            eightwothree
+            abcone2threexyz
+            xtwone3four
+            4nineeightseven2
+            zoneight234
+            7pqrstsixteen
+        """;
+
+        Assert.AreEqual(281, Solution.PartTwo(input));
+    }
+
 }
