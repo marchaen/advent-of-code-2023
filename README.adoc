@@ -29,13 +29,22 @@ day e. g. Day 1 => C#, Day 2 => Rust and so on, looping back to C# after Python.
 |===
 | Day | Language | Part 1 | Part 2
 
-| 0
-| None
+| 1
+| C#
 | Y
 | Y
 |===
 
 == Instructions for running
 
-TODO: Write instructions for running the solutions (for each language)
+=== C#
+
+The c# solutions can be run by executing one of the following two commands:
+
+. `cd DayXX.Solutions && dotnet run`
+. `dotnet run --project DayXX.Solutions`
+
+:dotnet-8-sdk-url: https://dotnet.microsoft.com/en-us/download/dotnet/8.0
+
+NOTE: An installation of the {dotnet-8-sdk-url}[dotnet 8.0 sdk] is required.
 
