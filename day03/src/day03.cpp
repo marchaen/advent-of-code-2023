@@ -107,3 +107,5 @@ int solve_part_one(const std::string &input) {
 
     return part_number;
 }
+
+int solve_part_two(const std::string &input) { return 0; }

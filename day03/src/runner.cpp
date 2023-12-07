@@ -13,5 +13,6 @@ int main(int argc, char *argv[]) {
 
     std::string input = buffer.str();
     std::cout << "Solve part one: " << solve_part_one(input) << std::endl;
+    std::cout << "Solve part two: " << solve_part_two(input) << std::endl;
     return 0;
 }
