@@ -9,3 +9,6 @@ obj/
 debug/
 target/
 
+# c++ build directory
+build/
+
