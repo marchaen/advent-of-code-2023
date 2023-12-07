@@ -41,7 +41,7 @@ day e. g. Day 1 => C#, Day 2 => Rust and so on, looping back to C# after Python.
 
 | 3
 | C++
-| N
+| Y
 | N
 |===
 
