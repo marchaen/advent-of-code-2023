@@ -38,6 +38,11 @@ day e. g. Day 1 => C#, Day 2 => Rust and so on, looping back to C# after Python.
 | Rust
 | Y
 | Y
+
+| 3
+| C++
+| N
+| N
 |===
 
 == Instructions for running
@@ -60,4 +65,24 @@ The rust solutions can be run by executing `cargo run` in the project directory.
 :rustlang: https://www.rust-lang.org/tools/install
 
 NOTE: An installation of the {rustlang}[rustlang toolchain] is required.
+
+=== C++
+
+The c++ solutions can be build and run by executing the following commands.
+
+[source, console]
+....
+# Skip if already exists
+mkdir build
+
+cd build
+
+# Again skip on additional builds
+cmake ..
+
+make
+./dayXX/runner
+....
+
+NOTE: Requires `cmake > 3.0` and a c\++ toolchain that supports C++20.
 
