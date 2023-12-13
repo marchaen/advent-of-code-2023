@@ -1,3 +1,35 @@
+type Card = {
+    id: number,
+    winning: number[],
+    got: number[]
+};
+
+function parseInput(input: string): Card[] {
+    return Array.from(
+        input.split('\n').map(line => {
+            // Example input: Card 1: 41 48 83 86 17 | 83 86  6 31 17  9 48 53
+            const idEnd = line.indexOf(':');
+
+            const id = parseInt(line.slice(5, idEnd));
+            const rawLists = line.slice(idEnd + 1);
+
+            const listSplitter = rawLists.indexOf('|');
+
+            const winning = Array.from(rawLists.slice(0, listSplitter).trim()
+                .split(' ')
+                .filter(rawNumber => rawNumber.trim().length != 0)
+                .map(rawNumber => parseInt(rawNumber)));
+
+            const got = Array.from(rawLists.slice(listSplitter + 1).trim()
+                .split(' ')
+                .filter(rawNumber => rawNumber.trim().length != 0)
+                .map(rawNumber => parseInt(rawNumber)));
+
+            return { id, winning, got };
+        })
+    );
+}
+
 /**
  * Implementation of the solution for adventofcode 2023 day 04 part one
  *
@@ -47,6 +79,19 @@
  * worth in total?**
  */
 export function solvePartOne(input: string): number {
-    return 0;
+    return parseInput(input).map(card => {
+        let points = 0;
+
+        for (let index = 0; index < card.got.length; index++) {
+            if (card.winning.includes(card.got[index])) {
+                if (points == 0)
+                    points = 1;
+                else
+                    points *= 2;
+            }
+        }
+
+        return points;
+    }).reduce(((sum, current) => sum += current));
 }
 
