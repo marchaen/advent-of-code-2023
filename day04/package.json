@@ -1,0 +1,16 @@
+{
+    "name": "day04",
+    "version": "0.0.0",
+    "description": "Solutions of the day04 puzzles of AdventOfCode 2023",
+    "scripts": {
+        "start": "tsc && node build/index.js",
+        "test": "tsc && node build/lib.test.js"
+    },
+    "author": "marchaen",
+    "license": "Apache-2.0",
+    "devDependencies": {
+        "@tsconfig/node20": "^20.1.2",
+        "@types/node": "^20.10.4",
+        "typescript": "^5.3.3"
+    }
+}

@@ -43,6 +43,11 @@ day e. g. Day 1 => C#, Day 2 => Rust and so on, looping back to C# after Python.
 | C++
 | Y
 | N
+
+| 4
+| JavaScript
+| N
+| N
 |===
 
 == Instructions for running
@@ -85,4 +90,14 @@ make
 ....
 
 NOTE: Requires `cmake > 3.0` and a c\++ toolchain that supports C++20.
+
+=== JavaScript
+
+The javascript solutions can be run by executing `npm i && npm run start` in the
+project directories.
+
+:nodejs: https://nodejs.org/en/download
+
+NOTE: Requires an installation of {nodejs}[nodejs] equal to or lather than
+version `20.10`.
 

@@ -12,3 +12,6 @@ target/
 # c++ build directory
 build/
 
+# nodejs dependencies
+node_modules/
+
