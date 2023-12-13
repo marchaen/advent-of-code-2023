@@ -46,8 +46,8 @@ day e. g. Day 1 => C#, Day 2 => Rust and so on, looping back to C# after Python.
 
 | 4
 | JavaScript
-| N
-| N
+| Y
+| Y
 |===
 
 == Instructions for running
