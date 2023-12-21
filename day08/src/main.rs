@@ -103,33 +103,9 @@ mod solution {
     ///
     /// Starting at `AAA`, follow the left/right instructions. **How many steps
     /// are required to reach `ZZZ`?**
-    pub fn part_one(input: &str) -> u32 {
-        let (instructions, map_points) = parse_input(input);
-
-        let mut next_instruction = 0usize;
-        let mut steps = 0;
-        let mut current_point = "AAA";
-
-        loop {
-            if current_point == "ZZZ" {
-                break;
-            }
-
-            match instructions[next_instruction] {
-                Instruction::Left => current_point = &map_points[current_point].0,
-                Instruction::Right => current_point = &map_points[current_point].1,
-            }
-
-            next_instruction += 1;
-
-            if next_instruction >= instructions.len() {
-                next_instruction = 0;
-            }
-
-            steps += 1;
-        }
-
-        steps
+    pub fn part_one(input: &str) -> u64 {
+        let (instructions, points) = parse_input(input);
+        count_steps_until(&instructions, &points, "AAA", |point| point == "ZZZ")
     }
 
     /// Implementation of the solution for the following problem (day 08 part two)
@@ -197,24 +173,22 @@ mod solution {
     pub fn part_two(input: &str) -> u64 {
         let (instructions, points) = parse_input(input);
 
-        find_least_common_multiple(
-            &points
-                .keys()
-                .filter_map(|point| {
-                    if point.ends_with('A') {
-                        Some(find_steps_to_next_z(point, &instructions, &points))
-                    } else {
-                        None
-                    }
-                })
-                .collect::<Vec<_>>(),
-        )
+        let minimum_steps = points
+            .keys()
+            .filter(|point| point.ends_with('A'))
+            .map(|point| {
+                count_steps_until(&instructions, &points, point, |point| point.ends_with('Z'))
+            })
+            .collect::<Vec<_>>();
+
+        find_least_common_multiple(&minimum_steps)
     }
 
-    fn find_steps_to_next_z<'point, M>(
-        point: &'point str,
+    fn count_steps_until<'point, M>(
         instructions: &[Instruction],
         points: &'point M,
+        point: &'point str,
+        should_stop: fn(&str) -> bool,
     ) -> u64
     where
         M: Index<&'point str, Output = (String, String)>,
@@ -224,7 +198,7 @@ mod solution {
         let mut current_point = point;
 
         loop {
-            if current_point.ends_with('Z') {
+            if should_stop(current_point) {
                 break;
             }
 
