@@ -13,7 +13,7 @@ mod solution {
         Right,
     }
 
-    fn parse_input(input: &str) -> (Vec<Instruction>, HashMap<String, (String, String)>) {
+    fn parse_input(input: &str) -> (Vec<Instruction>, HashMap<&str, (&str, &str)>) {
         let (raw_instructions, raw_map_points) = input
             .split_once("\n\n")
             .expect("Expect instructions then an empty line and then the map points.");
@@ -41,7 +41,7 @@ mod solution {
                     .split_once(", ")
                     .expect("Expect connected points to be comma space separated.");
 
-                (name.to_owned(), (left.to_owned(), right.to_owned()))
+                (name, (left, right))
             })
             .collect();
 
@@ -184,14 +184,15 @@ mod solution {
         find_least_common_multiple(&minimum_steps)
     }
 
-    fn count_steps_until<'point, M>(
+    fn count_steps_until<'p, 'm, M>(
         instructions: &[Instruction],
-        points: &'point M,
-        point: &'point str,
+        points: &M,
+        point: &'p str,
         should_stop: fn(&str) -> bool,
     ) -> u64
     where
-        M: Index<&'point str, Output = (String, String)>,
+        M: Index<&'p str, Output = (&'m str, &'m str)>,
+        'm: 'p,
     {
         let mut next_instruction = 0usize;
         let mut steps = 0;
