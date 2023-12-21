@@ -68,7 +68,7 @@ y = yes, n = no, ? = Skipped for now
 
 | 8
 | Rust
-| ?
+| Y
 | ?
 |===
 

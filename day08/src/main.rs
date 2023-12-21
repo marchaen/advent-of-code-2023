@@ -4,6 +4,48 @@ fn main() {
 }
 
 mod solution {
+    use std::collections::HashMap;
+
+    #[derive(Debug)]
+    enum Instruction {
+        Left,
+        Right,
+    }
+
+    fn parse_input(input: &str) -> (Vec<Instruction>, HashMap<String, (String, String)>) {
+        let (raw_instructions, raw_map_points) = input
+            .split_once("\n\n")
+            .expect("Expect instructions then an empty line and then the map points.");
+
+        let instructions = raw_instructions
+            .chars()
+            .map(|raw_instruction| match raw_instruction {
+                'L' => Instruction::Left,
+                'R' => Instruction::Right,
+                _ => panic!("Instructions have to be either L or R."),
+            })
+            .collect();
+
+        let map_points = raw_map_points
+            .split('\n')
+            .filter(|line| !line.is_empty())
+            .map(|raw_map_point| {
+                let (name, connected_points) = raw_map_point
+                    .split_once(" = (")
+                    .expect("Expect map point in format 'name = (left, right)'.");
+
+                let (left, right) = connected_points
+                    .strip_suffix(')')
+                    .expect("Expect closing brace at the end of a map point.")
+                    .split_once(", ")
+                    .expect("Expect connected points to be comma space separated.");
+
+                (name.to_owned(), (left.to_owned(), right.to_owned()))
+            })
+            .collect();
+
+        (instructions, map_points)
+    }
 
     /// Implementation of the solution for the following problem
     ///
@@ -61,7 +103,32 @@ mod solution {
     /// Starting at `AAA`, follow the left/right instructions. **How many steps
     /// are required to reach `ZZZ`?**
     pub fn part_one(input: &str) -> u32 {
-        0
+        let (instructions, map_points) = parse_input(input);
+
+        let mut next_instruction = 0usize;
+        let mut steps = 0;
+        let mut current_point = "AAA";
+
+        loop {
+            if current_point == "ZZZ" {
+                break;
+            }
+
+            match instructions[next_instruction] {
+                Instruction::Left => current_point = &map_points[current_point].0,
+                Instruction::Right => current_point = &map_points[current_point].1,
+            }
+
+            next_instruction += 1;
+
+            if next_instruction >= instructions.len() {
+                next_instruction = 0;
+            }
+
+            steps += 1;
+        }
+
+        steps
     }
 }
 
