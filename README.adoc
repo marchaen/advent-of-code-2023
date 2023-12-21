@@ -18,12 +18,14 @@ day e. g. Day 1 => C#, Day 2 => Rust and so on, looping back to C# after Python.
 .Languages
 - C#
 - Rust
-- C++
+- C / C++
 - JavaScript
 - Java
 - Python 
 
 == Solution Overview
+
+y = yes, n = no, ? = Skipped for now
 
 [cols="1,1,1,1"]
 |===
@@ -48,6 +50,26 @@ day e. g. Day 1 => C#, Day 2 => Rust and so on, looping back to C# after Python.
 | JavaScript
 | Y
 | Y
+
+| 5
+| Java
+| ?
+| ?
+
+| 6
+| Python
+| ?
+| ?
+
+| 7
+| C#
+| ?
+| ?
+
+| 8
+| Rust
+| ?
+| ?
 |===
 
 == Instructions for running
