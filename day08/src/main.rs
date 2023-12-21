@@ -5,7 +5,7 @@ fn main() {
 }
 
 mod solution {
-    use std::collections::HashMap;
+    use std::{collections::HashMap, ops::Index};
 
     #[derive(Debug)]
     enum Instruction {
@@ -194,9 +194,79 @@ mod solution {
     ///
     /// Simultaneously start on every node that ends with `A`. **How many steps
     /// does it take before you're only on nodes that end with `Z`?**
-    pub fn part_two(input: &str) -> u32 {
-        let (instructions, map_points) = parse_input(input);
-        0
+    pub fn part_two(input: &str) -> u64 {
+        let (instructions, points) = parse_input(input);
+
+        find_least_common_multiple(
+            &points
+                .keys()
+                .filter_map(|point| {
+                    if point.ends_with('A') {
+                        Some(find_steps_to_next_z(point, &instructions, &points))
+                    } else {
+                        None
+                    }
+                })
+                .collect::<Vec<_>>(),
+        )
+    }
+
+    fn find_steps_to_next_z<'point, M>(
+        point: &'point str,
+        instructions: &[Instruction],
+        points: &'point M,
+    ) -> u64
+    where
+        M: Index<&'point str, Output = (String, String)>,
+    {
+        let mut next_instruction = 0usize;
+        let mut steps = 0;
+        let mut current_point = point;
+
+        loop {
+            if current_point.ends_with('Z') {
+                break;
+            }
+
+            match instructions[next_instruction] {
+                Instruction::Left => current_point = &points[current_point].0,
+                Instruction::Right => current_point = &points[current_point].1,
+            }
+
+            next_instruction += 1;
+
+            if next_instruction >= instructions.len() {
+                next_instruction = 0;
+            }
+
+            steps += 1;
+        }
+
+        steps
+    }
+
+    fn greatest_common_divisor(mut left: u64, mut right: u64) -> u64 {
+        while right != 0 {
+            if left > right {
+                std::mem::swap(&mut left, &mut right);
+            }
+            right %= left;
+        }
+
+        left
+    }
+
+    fn find_least_common_multiple(numbers: &[u64]) -> u64 {
+        match numbers.len() {
+            0 => panic!("Can't get least common multiple of empty slice."),
+            1 => numbers[0],
+            _ => {
+                let left = numbers[0];
+                let right = find_least_common_multiple(&numbers[1..]);
+
+                left * right / greatest_common_divisor(left, right)
+            }
+        }
     }
 }
 
