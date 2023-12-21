@@ -15,3 +15,6 @@ build/
 # nodejs dependencies
 node_modules/
 
+# python compiler cache
+__pycache__/
+

@@ -123,3 +123,10 @@ project directories.
 NOTE: Requires an installation of {nodejs}[nodejs] equal to or lather than
 version `20.10`.
 
+=== Python
+
+The python solutions can be run by executing `python3 runner.py` in the project
+directories.
+
+NOTE: Requires an installation of python3.
+
