@@ -1,26 +1,10 @@
 import operator
 from functools import reduce
-from typing import List, Tuple
+from typing import List
 
 
-def parse_input(input: str) -> List[Tuple[int, int]]:
-    # Input example
-    # Time:      7  15   30
-    # Distance:  9  40  200
-
-    def parse_number_list(raw_numbers, prefix_length) -> List[int]:
-        return [
-            int(n)
-            for n in raw_numbers[prefix_length:].strip().split(" ")
-            if len(n) != 0
-        ]
-
-    (times, distances) = input.split("\n", 1)
-
-    times = parse_number_list(times, 5)
-    distances = parse_number_list(distances, 9)
-
-    return list(zip(times, distances))
+def find_possible_wins(time: int, distance: int) -> int:
+    return len([speed for speed in range(1, time) if speed * (time - speed) > distance])
 
 
 def part_one(input: str) -> int:
@@ -104,15 +88,66 @@ def part_one(input: str) -> int:
     Determine the number of ways you could beat the record in each race. **What
     do you get if you multiply these numbers together?**
     """
-    races = parse_input(input)
+    # Input example
+    # Time:      7  15   30
+    # Distance:  9  40  200
 
-    possible_wins = [
-        len([speed for speed in range(1, time) if speed * (time - speed) > distance])
-        for (time, distance) in races
-    ]
+    def parse_number_list(raw_numbers, prefix_length) -> List[int]:
+        return [
+            int(n)
+            for n in raw_numbers[prefix_length:].strip().split(" ")
+            if len(n) != 0
+        ]
 
-    return reduce(operator.mul, possible_wins)
+    (times, distances) = input.split("\n", 1)
+
+    times = parse_number_list(times, 5)
+    distances = parse_number_list(distances, 9)
+
+    races = list(zip(times, distances))
+
+    return reduce(
+        operator.mul, [find_possible_wins(time, distance) for (time, distance) in races]
+    )
 
 
 def part_two(input: str) -> int:
-    return 0
+    """
+    # Solves part two of day 6 of advent of code 2023
+
+    As the race is about to start, you realize the piece of paper with race
+    times and record distances you got earlier actually just has very bad
+    kerning. There's really **only one race** - ignore the spaces between the
+    numbers on each line.
+
+    So, the example from before:
+
+    ```
+    Time:      7  15   30
+    Distance:  9  40  200
+    ```
+
+    ...now instead means this:
+
+    ```
+    Time:      71530
+    Distance:  940200
+    ```
+
+    Now, you have to figure out how many ways there are to win this single race.
+    In this example, the race lasts for **`71530` milliseconds** and the record
+    distance you need to beat is **`940200` millimeters**. You could hold the
+    button anywhere from `14` to `71516` milliseconds and beat the record, a
+    total of **`71503`** ways!
+
+    **How many ways can you beat the record in this one much longer race?**
+    """
+    # Input example
+    # Time:      7  15   30
+    # Distance:  9  40  200
+    (time, distance) = input.split("\n", 1)
+
+    time = int(reduce(operator.add, time[5:].strip().split(" ")))
+    distance = int(reduce(operator.add, distance[9:].strip().split(" ")))
+
+    return find_possible_wins(time, distance)
