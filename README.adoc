@@ -58,7 +58,7 @@ y = yes, n = no, ? = Skipped for now
 
 | 6
 | Python
-| ?
+| Y
 | ?
 
 | 7
