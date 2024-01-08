@@ -112,3 +112,7 @@ def part_one(input: str) -> int:
     ]
 
     return reduce(operator.mul, possible_wins)
+
+
+def part_two(input: str) -> int:
+    return 0
