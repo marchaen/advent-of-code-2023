@@ -123,6 +123,14 @@ project directories.
 NOTE: Requires an installation of {nodejs}[nodejs] equal to or lather than
 version `20.10`.
 
+=== Java
+
+The java solutions can be run by executing `./gradlew(.bat) dayXX:run` where
+.bat is only required on windows.
+
+:jdk21: https://jdk.java.net/21/
+NOTE: Requires {jdk21}[JDK 21] in the `$PATH`.
+
 === Python
 
 The python solutions can be run by executing `python3 runner.py` in the project
