@@ -1,6 +1,106 @@
 package day05;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.OptionalLong;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 public class Solution {
+
+    private static class Range {
+        long sourceOffset;
+        long start;
+        long length;
+
+        Range(String rawRange) {
+            // Example:
+            // 50 98 2
+            var rawValues = rawRange.split(" ");
+
+            this.sourceOffset = Long.parseLong(rawValues[0]);
+            this.start = Long.parseLong(rawValues[1]);
+            this.length = Long.parseLong(rawValues[2]);
+        }
+
+        OptionalLong tryToTranslate(long sourceValue) {
+            if (sourceValue < start || sourceValue > (start + length))
+                return OptionalLong.empty();
+
+            return OptionalLong.of(sourceOffset + (sourceValue - start));
+        }
+
+    }
+
+    private static class TranslationGroup {
+        String source;
+        String destination;
+        List<Range> maps;
+
+        String source() {
+            return source;
+        }
+
+        TranslationGroup(String source, String destination, List<Range> maps) {
+            this.source = source;
+            this.destination = destination;
+            this.maps = maps;
+        }
+
+        long translate(long sourceValue) {
+            return this.maps.stream()
+                    .map((map) -> map.tryToTranslate(sourceValue))
+                    .flatMap((maybeTranslation) -> maybeTranslation.stream().boxed())
+                    .findAny()
+                    .orElseGet(() -> sourceValue);
+        }
+
+    }
+
+    private static record ParsedInput(
+            List<Long> seeds,
+            Map<String, TranslationGroup> translations) {
+    }
+
+    private static ParsedInput parseInput(String input) {
+        // Example input:
+        //
+        // seeds: 79 14 55 13
+        //
+        // seed-to-soil map:
+        // 50 98 2
+        // 52 50 48
+        //
+        // (continued)
+
+        var splitted = input.split("\n\n", 2);
+        var rawSeeds = splitted[0];
+        var rawTranslations = splitted[1];
+
+        // "seeds: 79 14 55 13"
+        var seeds = Stream.of(rawSeeds.substring(7).split(" "))
+                .map(Long::parseLong)
+                .toList();
+
+        var translations = Stream.of(rawTranslations.split("\n\n")).map((raw) -> {
+            // seed-to-soil map:\n
+            // 50 98 2\n
+            // 52 50 48\n
+
+            var lines = raw.split("\n");
+
+            var rawSrcDest = lines[0].split("-to-", 2);
+            var ranges = Arrays.stream(lines, 1, lines.length)
+                    .map((rawRange) -> new Range(rawRange))
+                    .toList();
+
+            return new TranslationGroup(rawSrcDest[0], rawSrcDest[1].split(" ")[0], ranges);
+        }).collect(Collectors.toMap(TranslationGroup::source, Function.identity()));
+
+        return new ParsedInput(seeds, translations);
+    }
 
     /**
      *
@@ -131,8 +231,20 @@ public class Solution {
      * What is the lowest location number that corresponds to any of the initial
      * seed numbers?
      */
-    public static int partOne(String input) {
-        return 0;
+    public static long partOne(String input) {
+        var parsedInput = parseInput(input);
+
+        return parsedInput.seeds.stream().map((seed) -> {
+            var currentMap = parsedInput.translations.get("seed");
+            long translation = seed;
+
+            while (currentMap != null) {
+                translation = currentMap.translate(translation);
+                currentMap = parsedInput.translations.get(currentMap.destination);
+            }
+
+            return translation;
+        }).min(Long::compare).get();
     }
 
 }
