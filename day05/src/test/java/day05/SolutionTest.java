@@ -45,7 +45,12 @@ humidity-to-location map:
 
     @Test
     void partOne() {
-        assertEquals(Solution.partOne(INPUT), 35);
+        assertEquals(35, Solution.partOne(INPUT));
+    }
+
+    @Test
+    void partTwo() {
+        assertEquals(46, Solution.partTwo(INPUT));
     }
 
 }

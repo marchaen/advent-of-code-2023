@@ -9,6 +9,7 @@ public class Runner {
         try {
             var input = Files.readString(Path.of("..", "input", "Day05.txt"));
             System.out.println(Solution.partOne(input));
+            System.out.println(Solution.partTwo(input));
         } catch (IOException ignored) {
             System.err.println("Couldn't read puzzle input. Run from project root dir!");
         }
