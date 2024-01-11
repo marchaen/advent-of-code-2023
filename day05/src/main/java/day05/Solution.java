@@ -1,8 +1,11 @@
 package day05;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.OptionalLong;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -10,12 +13,18 @@ import java.util.stream.Stream;
 
 public class Solution {
 
-    private static class Range {
+    private static record Range(long start, long length) {
+        boolean isUnused() {
+            return this.start == 0 && this.length == 0;
+        }
+    }
+
+    private static class TranslationRange {
         long sourceOffset;
         long start;
         long length;
 
-        Range(String rawRange) {
+        TranslationRange(String rawRange) {
             // Example:
             // 50 98 2
             var rawValues = rawRange.split(" ");
@@ -32,18 +41,44 @@ public class Solution {
             return OptionalLong.of(sourceOffset + (sourceValue - start));
         }
 
+        Optional<List<Range>> tryToTranslateRange(Range range) {
+            if (range.start + length < this.start || range.start > this.start + length)
+                return Optional.of(List.of(new Range(0, 0), range, new Range(0, 0)));
+
+            var translations = new ArrayList<Range>();
+
+            if (range.start < this.start)
+                translations.add(new Range(range.start, this.start - range.start));
+            else
+                translations.add(new Range(0, 0));
+
+            var endRange = new Range(0, 0);
+
+            if (range.start + range.length > this.start + this.length) {
+                var remaining = range.start + range.length - this.start + this.length;
+                endRange = new Range(this.start + this.length, remaining);
+            }
+
+            translations.add(new Range(
+                    sourceOffset + range.start - this.start,
+                    range.length - translations.get(0).length - endRange.length));
+
+            translations.add(endRange);
+            return Optional.of(translations);
+        }
+
     }
 
     private static class TranslationGroup {
         String source;
         String destination;
-        List<Range> maps;
+        List<TranslationRange> maps;
 
         String source() {
             return source;
         }
 
-        TranslationGroup(String source, String destination, List<Range> maps) {
+        TranslationGroup(String source, String destination, List<TranslationRange> maps) {
             this.source = source;
             this.destination = destination;
             this.maps = maps;
@@ -57,6 +92,13 @@ public class Solution {
                     .orElseGet(() -> sourceValue);
         }
 
+        List<Range> translateRange(Range sourceRange) {
+            return this.maps.stream()
+                    .map((map) -> map.tryToTranslateRange(sourceRange))
+                    .flatMap(Optional::stream)
+                    .findAny()
+                    .get();
+        }
     }
 
     private static record ParsedInput(
@@ -93,7 +135,7 @@ public class Solution {
 
             var rawSrcDest = lines[0].split("-to-", 2);
             var ranges = Arrays.stream(lines, 1, lines.length)
-                    .map((rawRange) -> new Range(rawRange))
+                    .map((rawRange) -> new TranslationRange(rawRange))
                     .toList();
 
             return new TranslationGroup(rawSrcDest[0], rawSrcDest[1].split(" ")[0], ranges);
@@ -279,7 +321,49 @@ public class Solution {
      * corresponds to any of the initial seed numbers?
      */
     public static long partTwo(String input) {
-        return 0;
+        var parsedInput = parseInput(input);
+        var seedRanges = new ArrayList<Range>();
+
+        long start = -1;
+
+        for (long seed : parsedInput.seeds) {
+            if (start == -1) {
+                start = seed;
+                continue;
+            }
+
+            seedRanges.add(new Range(start, seed));
+            start = -1;
+        }
+
+        return seedRanges.stream().map((seedRange) -> {
+            var currentMap = parsedInput.translations.get("seed");
+            List<Range> currentTranslations = new ArrayList<Range>(List.of(seedRange));
+
+            while (currentMap != null) {
+                var nextTranslations = new ArrayList<Range>();
+
+                for (Range range : currentTranslations) {
+                    if (range.isUnused())
+                        continue;
+                    nextTranslations.addAll(currentMap.translateRange(range));
+                }
+
+                currentTranslations = nextTranslations;
+                currentMap = parsedInput.translations.get(currentMap.destination);
+            }
+
+            return currentTranslations;
+        }).map((translations) -> {
+            return translations.stream()
+                    .map((range) -> {
+                        if (range.start == 0)
+                            return Long.MAX_VALUE;
+                        return range.start;
+                    })
+                    .min(Long::compare)
+                    .get();
+        }).min(Long::compare).get();
     }
 
 }

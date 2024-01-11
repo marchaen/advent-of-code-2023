@@ -53,8 +53,8 @@ y = yes, n = no, ? = Skipped for now
 
 | 5
 | Java
-| ?
-| ?
+| Y
+| N
 
 | 6
 | Python
