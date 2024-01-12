@@ -25,7 +25,7 @@ day e. g. Day 1 => C#, Day 2 => Rust and so on, looping back to C# after Python.
 
 == Solution Overview
 
-y = yes, n = no, ? = Skipped for now
+y = yes, I solved it, n = no, I didn't solve it, ? = Didn't yet try to solve it
 
 [cols="1,1,1,1"]
 |===
@@ -70,9 +70,97 @@ y = yes, n = no, ? = Skipped for now
 | Rust
 | Y
 | Y
+
+| 9
+| C++
+| ?
+| ?
+
+| 10
+| JavaScript
+| ?
+| ?
+
+| 11
+| Java
+| ?
+| ?
+
+| 12
+| Python
+| ?
+| ?
+
+| 13
+| C#
+| ?
+| ?
+
+| 14
+| Rust
+| ?
+| ?
+
+| 15
+| C++
+| ?
+| ?
+
+| 16
+| JavaScript
+| ?
+| ?
+
+| 17
+| Java
+| ?
+| ?
+
+| 18
+| Python
+| ?
+| ?
+
+| 19
+| C#
+| ?
+| ?
+
+| 20
+| Rust
+| ?
+| ?
+
+| 21
+| C++
+| ?
+| ?
+
+| 22
+| JavaScript
+| ?
+| ?
+
+| 23
+| Java
+| ?
+| ?
+
+| 24
+| Python
+| ?
+| ?
+
+| 25
+| Rust{empty}footnote:[Skipped C# since this is the last day and I like writing rust more.]
+| ?
+| ?
 |===
 
 == Instructions for running
+
+The following sections detail how to run the solutions for each programming
+language, because remembering it for all of them is a bit hard.
 
 === C#
 
