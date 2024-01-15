@@ -4,6 +4,7 @@ README.html
 # C# build directories
 bin/
 obj/
+TestResults/
 
 # Rust compiled files and executables
 debug/
