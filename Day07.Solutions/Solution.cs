@@ -2,12 +2,18 @@ namespace Day07.Solutions;
 
 public class Solution
 {
-    static List<Hand> ParseInput(string input)
+    static List<Hand> ParseInput(string input, bool withJokers = false)
     {
         return input
             .Split('\n', System.StringSplitOptions.RemoveEmptyEntries)
-            .Select((line) => Hand.TryParseFrom(line))
+            .Select((line) => Hand.TryParseFrom(line, withJokers))
             .ToList();
+    }
+
+    static int CalculateWinnings(List<Hand> hands)
+    {
+        hands.Sort();
+        return hands.Select((hand, index) => hand.WeigthedBid(index)).Sum();
     }
 
     /// <summary>
@@ -102,12 +108,7 @@ public class Solution
     ///         winnings?
     ///     </para>
     /// </summary>
-    public static int PartOne(string input)
-    {
-        var hands = ParseInput(input);
-        hands.Sort();
-        return hands.Select((hand, index) => hand.WeigthedBid(index)).Sum();
-    }
+    public static int PartOne(string input) => CalculateWinnings(ParseInput(input));
 
     /// <summary>
     ///     Solution for the second part of day 02 of AoC. The following
@@ -152,8 +153,5 @@ public class Solution
     ///         set. What are the new total winnings?
     ///     </para>
     /// </summary>
-    public static int PartTwo(string input)
-    {
-        return 0;
-    }
+    public static int PartTwo(string input) => CalculateWinnings(ParseInput(input, true));
 }

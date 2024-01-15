@@ -28,7 +28,7 @@ internal enum HandType
     FiveOfAKind
 }
 
-internal class CardMethods
+internal static class CardMethods
 {
     internal static Card? TryParse(char input) =>
         input switch
@@ -49,11 +49,24 @@ internal class CardMethods
             _ => null
         };
 
-    internal static HandType DetermineHandType(Card[] cards)
+    internal static HandType DetermineHandType(Card[] cards, bool withJokers = false)
     {
         var cardCounts = cards
             .GroupBy((card) => card)
             .ToDictionary((group) => group.Key, (group) => group.Count());
+
+        if (withJokers && cardCounts.ContainsKey(Card.J) && cardCounts[Card.J] != 5)
+        {
+            var jokerCount = cardCounts[Card.J];
+            cardCounts.Remove(Card.J);
+
+            var highestCardCount = cardCounts
+                .OrderBy((keyValue) => keyValue.Value)
+                .Select((keyValue) => keyValue.Key)
+                .First();
+
+            cardCounts[highestCardCount] += jokerCount;
+        }
 
         return cardCounts.Count() switch
         {
@@ -65,6 +78,33 @@ internal class CardMethods
             _ => throw new Exception("Determining the hand type only works with exactly five cards")
         };
     }
+
+    internal static int jokerCompareValue(Card card) =>
+        card switch
+        {
+            Card.J => 0,
+            Card.TWO => 1,
+            Card.THREE => 2,
+            Card.FOUR => 3,
+            Card.FIVE => 4,
+            Card.SIX => 5,
+            Card.SEVEN => 6,
+            Card.EIGHT => 7,
+            Card.NINE => 8,
+            Card.T => 9,
+            Card.Q => 10,
+            Card.K => 11,
+            Card.A => 12,
+            _ => -1
+        };
+
+    internal static int ComplexCompareTo(this Card card, Card other, bool withJokers)
+    {
+        if (!withJokers)
+            return card.CompareTo(other);
+
+        return jokerCompareValue(card) - jokerCompareValue(other);
+    }
 }
 
 internal class Hand : IComparable<Hand>
@@ -72,10 +112,11 @@ internal class Hand : IComparable<Hand>
     Card[] cards;
     int bid;
     HandType handType;
+    bool jokerActive = false;
 
     public int WeigthedBid(int listIndex) => this.bid * (listIndex + 1);
 
-    internal static Hand TryParseFrom(string input)
+    internal static Hand TryParseFrom(string input, bool withJokers = false)
     {
         // Example input:
         // 32T3K 765
@@ -99,17 +140,18 @@ internal class Hand : IComparable<Hand>
             )
             .ToArray();
 
-        return new Hand(cards, int.Parse(rawBid));
+        return new Hand(cards, int.Parse(rawBid), withJokers);
     }
 
-    internal Hand(Card[] cards, int bid)
+    internal Hand(Card[] cards, int bid, bool withJokers = false)
     {
         if (cards.Count() != 5)
             throw new ArgumentException("Each hand needs to have exactly five cards");
 
         this.cards = cards;
         this.bid = bid;
-        this.handType = CardMethods.DetermineHandType(cards);
+        this.handType = CardMethods.DetermineHandType(cards, withJokers);
+        this.jokerActive = withJokers;
     }
 
     public int CompareTo(Hand? other)
@@ -124,7 +166,10 @@ internal class Hand : IComparable<Hand>
 
         for (int card = 0; card < 5; card++)
         {
-            var cardComparison = this.cards[card].CompareTo(other.cards[card]);
+            var cardComparison = this.cards[card].ComplexCompareTo(
+                other.cards[card],
+                this.jokerActive
+            );
 
             if (cardComparison != 0)
                 return cardComparison;
