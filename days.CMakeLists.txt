@@ -1,0 +1,20 @@
+# DAY_DIGITS is between 01 and 25
+set(DAY "day$ENV{DAY_DIGITS}")
+set(INPUT_NAME "Day$ENV{DAY_DIGITS}.txt")
+
+message("AdventOfCode ${DAY} (Input: ${INPUT_NAME})")
+
+project(${DAY})
+
+configure_file(../input/${INPUT_NAME} Input.txt COPYONLY)
+add_library(${DAY}-solution STATIC src/${DAY}.cpp)
+
+add_executable(${DAY}-runner src/runner.cpp)
+target_link_libraries(${DAY}-runner ${DAY}-solution)
+
+add_executable(${DAY}-tests src/tests.cpp)
+target_link_libraries(${DAY}-tests ${DAY}-solution)
+
+add_custom_target(${DAY})
+add_dependencies(${DAY} ${DAY}-runner ${DAY}-tests)
+

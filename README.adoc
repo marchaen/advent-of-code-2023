@@ -195,11 +195,11 @@ cd build
 # Again skip on additional builds
 cmake ..
 
-make
-./dayXX/runner
+make dayXX-runner
+cd ./dayXX && ./dayXX-runner
 ....
 
-NOTE: Requires `cmake > 3.0` and a c\++ toolchain that supports C++20.
+NOTE: Requires `cmake > 3.22` and a c\++ toolchain that supports C++23.
 
 === JavaScript
 

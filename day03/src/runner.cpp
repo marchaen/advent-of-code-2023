@@ -1,3 +1,4 @@
+#include <cstdlib>
 #include <fstream>
 #include <iostream>
 #include <sstream>
@@ -6,7 +7,12 @@
 #include "day03.hpp"
 
 int main(int argc, char *argv[]) {
-    std::ifstream input_file("Day03.txt");
+    std::ifstream input_file("Input.txt");
+
+    if (!input_file.good()) {
+        std::cout << "The \"Input.txt\" file couldn't be found in the cwd.";
+        std::exit(1);
+    }
 
     std::stringstream buffer;
     buffer << input_file.rdbuf();
