@@ -8,17 +8,20 @@ The rendered output of this adoc can be generated with the following command:
 asciidoctor README.adoc
 ////
 
-My solutions for the https://adventofcode.com/2023[AoC puzzles 2023]. AoC is a
+My solutions for the https://adventofcode.com/2023[AoC 2023 puzzles]. AoC is a
 Christmas themed coding event that takes place each December. Using it to learn
 a language or refresh general knowledge is a popular AoC activity.
 
 This year I will solve the problems using one of the following languages each
 day e. g. Day 1 => C#, Day 2 => Rust and so on, looping back to C# after Python.
 
+NOTE: C / C++ was replaced with Rust because of my desire to learn more rust for
+now.
+
 .Languages
 - C#
 - Rust
-- C / C++
+- C / C++ -> Rust
 - JavaScript
 - Java
 - Python 
@@ -42,7 +45,7 @@ y = yes, I solved it, n = no, I didn't solve it, ? = Didn't yet try to solve it
 | Y
 
 | 3
-| C++
+| C++{empty}footnote:[This solution was already written prior to the rust switch.]
 | Y
 | N
 
@@ -72,7 +75,7 @@ y = yes, I solved it, n = no, I didn't solve it, ? = Didn't yet try to solve it
 | Y
 
 | 9
-| C++
+| C++ -> Rust
 | ?
 | ?
 
@@ -102,7 +105,7 @@ y = yes, I solved it, n = no, I didn't solve it, ? = Didn't yet try to solve it
 | ?
 
 | 15
-| C++
+| C++ -> Rust
 | ?
 | ?
 
@@ -132,7 +135,7 @@ y = yes, I solved it, n = no, I didn't solve it, ? = Didn't yet try to solve it
 | ?
 
 | 21
-| C++
+| C++ -> Rust
 | ?
 | ?
 

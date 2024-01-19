@@ -6,6 +6,3 @@ project(advent-of-code-2023)
 set(ENV{DAY_DIGITS} "03")
 add_subdirectory(day$ENV{DAY_DIGITS})
 
-set(ENV{DAY_DIGITS} "09")
-add_subdirectory(day$ENV{DAY_DIGITS})
-
