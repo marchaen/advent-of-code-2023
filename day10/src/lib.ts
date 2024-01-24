@@ -1,4 +1,371 @@
-/* */
+const PipeLiteral = {
+    Vertical: "|",
+    Horizontal: "-",
+    TopToRight: "L",
+    TopToLeft: "J",
+    BottomToLeft: "7",
+    BottomToRight: "F",
+} as const;
+
+type PipeLiteral = typeof PipeLiteral[keyof typeof PipeLiteral];
+
+const Tile = {
+    Animal: "S",
+    Ground: ".",
+    ...PipeLiteral
+} as const;
+
+type Tile = typeof Tile[keyof typeof Tile];
+
+const Direction = ["North", "East", "South", "West"] as const;
+type Direction = typeof Direction[number];
+
+type Connections = {
+    [key in PipeLiteral]: Direction[];
+}
+
+const Connections: Connections = {
+    [PipeLiteral.Vertical]: ["North", "South"],
+    [PipeLiteral.Horizontal]: ["East", "West"],
+    [PipeLiteral.TopToRight]: ["North", "East"],
+    [PipeLiteral.TopToLeft]: ["North", "West"],
+    [PipeLiteral.BottomToLeft]: ["West", "South"],
+    [PipeLiteral.BottomToRight]: ["East", "South"]
+};
+
+type Grid = Tile[][];
+type Loop = Pipe[];
+
+type Coordinate = {
+    row: number,
+    column: number
+}
+
+type Neighbor = { tile: Tile, direction: Direction, coordinate: Coordinate };
+type MaybeNeighbor = Neighbor | null;
+
+type ConnectedPipe = { pipe: PipeLiteral, from: Direction, coordinate: Coordinate };
+
+type Pipe = {
+    previous: ConnectedPipe,
+    next: ConnectedPipe,
+    value: PipeLiteral
+    coordinate: Coordinate,
+    hasAnimal: boolean,
+}
+
+function isTile(raw: string): raw is Tile {
+    return Object.values(Tile).includes(raw as Tile);
+}
+
+function isPipe(raw: string): raw is PipeLiteral {
+    return Object.values(PipeLiteral).includes(raw as PipeLiteral);
+}
+
+function equalCoordinates(left: Coordinate, right: Coordinate): boolean {
+    return left.row === right.row && left.column == right.column;
+}
+
+function invertDirection(direction: Direction): Direction {
+    return Direction[(Direction.indexOf(direction) + 2) % 4];
+}
+
+function connectsTo(pipe: PipeLiteral, direction: Direction): boolean {
+    return Connections[pipe].includes(direction);
+}
+
+function toConnectedPipe(neighbor: Neighbor, replacementPipe: PipeLiteral | null): ConnectedPipe {
+    let pipe;
+
+    if (!isPipe(neighbor.tile)) {
+        if (replacementPipe === null)
+            throw new Error("No replacement pipe provided for non pipe neighbor.");
+        pipe = replacementPipe as PipeLiteral;
+    } else {
+        pipe = neighbor.tile;
+    }
+
+    return { pipe, from: neighbor.direction, coordinate: neighbor.coordinate };
+}
+
+function parseInput(input: string): Grid {
+    let grid: Tile[][] = [];
+
+    input.split("\n").forEach((line) => {
+        if (Array.from(line).some((tile) => !isTile(tile)))
+            throw new Error("The grid contains invalid tile values.");
+
+        grid.push([...line as unknown as Tile[]]);
+    });
+
+    return grid;
+}
+
+function findAnimalCoordinate(grid: Grid): Coordinate {
+    const row = grid.findIndex((row) => row.includes(Tile.Animal));
+    return {
+        row: row,
+        column: grid[row].findIndex((tile) => tile == Tile.Animal)
+    };
+
+}
+
+/**
+ * Search through the directions which each pipe can connect to and compare
+ * them to the neighbors of the animal to find the exact pipe which connects
+ * to the two neighbors.
+ */
+function findPipeOfAnimal(next: Neighbor, previous: Neighbor): PipeLiteral {
+    const directions = [invertDirection(next.direction), invertDirection(previous.direction)];
+    return Object.keys(Connections).find(
+        (key) => Connections[key as PipeLiteral]
+            .every(direction => directions.includes(direction))
+    ) as PipeLiteral;
+}
+
+function getNeighbors(grid: Grid, tile: Coordinate): Neighbor[] {
+    const { row, column } = tile;
+    let neighbors: Neighbor[] = [];
+
+    if (grid.length > row + 1)
+        neighbors.push({ tile: grid[row + 1][column], direction: "North", coordinate: { row: row + 1, column: column } });
+
+    if (column > 0)
+        neighbors.push({ tile: grid[row][column - 1], direction: "East", coordinate: { row: row, column: column - 1 } });
+
+    if (row > 0)
+        neighbors.push({ tile: grid[row - 1][column], direction: "South", coordinate: { row: row - 1, column: column } });
+
+    if (grid[row].length > column + 1)
+        neighbors.push({ tile: grid[row][column + 1], direction: "West", coordinate: { row: row, column: column + 1 } });
+
+    return neighbors;
+}
+
+function findConnectedPipes(tile: Tile, neighbors: Neighbor[]): { first: MaybeNeighbor, second: MaybeNeighbor } {
+    let first: MaybeNeighbor = null;
+    let second: MaybeNeighbor = null;
+
+    neighbors.forEach((neighbor) => {
+        // The animal is always a valid neighbor when searching for the loop
+        // Otherwise make sure the pipe can connect towards the current tile
+        if (neighbor.tile === Tile.Animal ||
+            (isPipe(neighbor.tile) && connectsTo(neighbor.tile, neighbor.direction))) {
+
+            // Make sure that the tile itself also can connect to the neighbor
+            if (isPipe(tile) && !connectsTo(tile, invertDirection(neighbor.direction)))
+                return;
+
+            // The neighbor is indeed connected to the current tile and can be
+            // set as the first or second connected pipe.
+            if (first == null) {
+                first = neighbor;
+                return;
+            }
+
+            second = neighbor;
+        }
+    });
+
+    return { first, second: second };
+}
+
+function findLoop(grid: Grid): Loop {
+    const animalCoordinate = findAnimalCoordinate(grid);
+
+    const { first: animalNext, second: animalPrevious } = findConnectedPipes(
+        Tile.Animal, getNeighbors(grid, animalCoordinate)
+    );
+
+    if (animalNext == null || animalPrevious == null)
+        throw new Error("The animal is not connected to two pipes");
+
+    const animalPipe: Pipe = {
+        next: toConnectedPipe(animalNext, null),
+        previous: toConnectedPipe(animalPrevious, null),
+        value: findPipeOfAnimal(animalNext, animalPrevious),
+        coordinate: animalCoordinate,
+        hasAnimal: true,
+    };
+
+    let loop = [animalPipe];
+    let previousPipe = animalPipe;
+
+    while (true) {
+        const neighbors = getNeighbors(grid, previousPipe.next.coordinate);
+        const { first, second } = findConnectedPipes(previousPipe.next.pipe, neighbors);
+
+        if (first == null || second == null)
+            throw new Error("There is no loop that is closed in istself in the grid.");
+
+        let previousNeighbor;
+        let nextNeighbor;
+
+        if (equalCoordinates(previousPipe.coordinate, first.coordinate)) {
+            previousNeighbor = first;
+            nextNeighbor = second;
+        } else {
+            previousNeighbor = second;
+            nextNeighbor = first;
+        }
+
+        let currentPipe: Pipe = {
+            next: toConnectedPipe(nextNeighbor, animalPipe.value),
+            previous: toConnectedPipe(previousNeighbor, animalPipe.value),
+            value: previousPipe.next.pipe,
+            coordinate: previousPipe.next.coordinate,
+            hasAnimal: false,
+        };
+
+        loop.push(currentPipe);
+
+        if (equalCoordinates(currentPipe.next.coordinate, animalPipe.coordinate)) {
+            break;
+        }
+
+        previousPipe = currentPipe;
+    }
+
+    return loop;
+}
+
+/*
+ * Scanning the area, you discover that the entire field you're standing on is
+ * densely packed with pipes; it was hard to tell at first because they're the
+ * same metallic silver color as the "ground". You make a quick sketch of all
+ * of the surface pipes you can see (your puzzle input).
+ *
+ * The pipes are arranged in a two-dimensional grid of **tiles**:
+ *
+ * - `|` is a **vertical pipe** connecting north and south.
+ * - `-` is a **horizontal pipe** connecting east and west.
+ * - `L` is a **90-degree bend** connecting north and east.
+ * - `J` is a **90-degree bend** connecting north and west.
+ * - `7` is a **90-degree bend** connecting south and west.
+ * - `F` is a **90-degree bend** connecting south and east.
+ * - `.` is **ground**; there is no pipe in this tile.
+ * - `S` is the **starting position** of the animal; there is a pipe on this
+ *   tile, but your sketch doesn't show what shape the pipe has.
+ *
+ * Based on the acoustics of the animal's scurrying, you're confident the pipe
+ * that contains the animal is **one large, continuous loop**.
+ *
+ * For example, here is a square loop of pipe:
+ *
+ * ```
+ * .....
+ * .F-7.
+ * .|.|.
+ * .L-J.
+ * .....
+ * ```
+ *
+ * If the animal had entered this loop in the northwest corner, the sketch would
+ * instead look like this:
+ *
+ * ```
+ * .....
+ * .S-7.
+ * .|.|.
+ * .L-J.
+ * .....
+ * ```
+ *
+ * In the above diagram, the `S` tile is still a 90-degree `F` bend: you can
+ * tell because of how the adjacent pipes connect to it.
+ * 
+ * Unfortunately, there are also many pipes that **aren't connected to the
+ * loop**! This sketch shows the same loop as above:
+ *
+ * ```
+ * -L|F7
+ * 7S-7|
+ * L|7||
+ * -L-J|
+ * L|-JF
+ * ```
+ *
+ * In the above diagram, you can still figure out which pipes form the main
+ * loop: they're the ones connected to `S`, pipes those pipes connect to, pipes
+ * **those** pipes connect to, and so on. Every pipe in the main loop connects
+ * to its two neighbors (including `S`, which will have exactly two pipes
+ * connecting to it, and which is assumed to connect back to those two pipes).
+ *
+ * Here is a sketch that contains a slightly more complex main loop:
+ *
+ * ``` 
+ * ..F7.
+ * .FJ|.
+ * SJ.L7
+ * |F--J
+ * LJ...
+ * ```
+ *
+ * Here's the same example sketch with the extra, non-main-loop pipe tiles also
+ * shown:
+ *
+ * ```
+ * 7-F7-
+ * .FJ|7
+ * SJLL7
+ * |F--J
+ * LJ.LJ
+ * ```
+ *
+ * If you want to **get out ahead of the animal**, you should find the tile in
+ * the loop that is **farthest** from the starting position. Because the animal
+ * is in the pipe, it doesn't make sense to measure this by direct distance.
+ * Instead, you need to find the tile that would take the longest number of
+ * steps **along the loop** to reach from the starting point - regardless of
+ * which way around the loop the animal went.
+ *
+ * In the first example with the square loop:
+ *
+ * ```
+ * .....
+ * .S-7.
+ * .|.|.
+ * .L-J.
+ * .....
+ * ```
+ *
+ * You can count the distance each tile in the loop is from the starting point
+ * like this:
+ *
+ * ```
+ * .....
+ * .012.
+ * .1.3.
+ * .234.
+ * .....
+ * ```
+ *
+ * In this example, the farthest point from the start is `4` steps away.
+ *
+ * Here's the more complex loop again:
+ *
+ * ```
+ * ..F7.
+ * .FJ|.
+ * SJ.L7
+ * |F--J
+ * LJ...
+ * ```
+ *
+ * Here are the distances for each tile on that loop:
+ *
+ * ```
+ * ..45.
+ * .236.
+ * 01.78
+ * 14567
+ * 23...
+ * ```
+ *
+ * Find the single giant loop starting at `S`. **How many steps along the loop
+ * does it take to get from the starting position to the point farthest from the
+ * starting position?**
+*/
 export function solvePartOne(input: string): number {
-    return 0;
+    return findLoop(parseInput(input)).length / 2;
 }
