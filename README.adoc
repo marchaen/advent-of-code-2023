@@ -82,7 +82,7 @@ y = yes, I solved it, n = no, I didn't solve it, ? = Didn't yet try to solve it
 | 10
 | JavaScript
 | Y
-| ?
+| N
 
 | 11
 | Java

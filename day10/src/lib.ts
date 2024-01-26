@@ -41,6 +41,17 @@ type Coordinate = {
     column: number
 }
 
+type Steps = {
+    [key in Direction]: Coordinate;
+}
+
+const Steps: Steps = {
+    "North": { row: -1, column: 0 },
+    "East": { row: 0, column: 1 },
+    "South": { row: 1, column: 0 },
+    "West": { row: 0, column: -1 }
+};
+
 type Neighbor = { tile: Tile, direction: Direction, coordinate: Coordinate };
 type MaybeNeighbor = Neighbor | null;
 
@@ -227,6 +238,53 @@ function findLoop(grid: Grid): Loop {
     }
 
     return loop;
+}
+
+function isInBounds(grid: Grid, coordinate: Coordinate) {
+    return coordinate.row >= 0 && coordinate.row < grid.length &&
+        coordinate.column >= 0 && coordinate.column < grid[0].length;
+}
+
+function countPipes(grid: Grid, walkingDirection: Direction, until: Coordinate): number {
+    const pipeToCount = ["North", "South"].includes(walkingDirection) ?
+        PipeLiteral.Horizontal : PipeLiteral.Vertical;
+
+    const startingPosition = structuredClone(until);
+    const invertedDirection = invertDirection(walkingDirection);
+
+    while (isInBounds(grid, startingPosition)) {
+        startingPosition.row += Steps[invertedDirection].row;
+        startingPosition.column += Steps[invertedDirection].column;
+    }
+
+    // The loop goes until the starting position is invalid so removing the
+    // last step is needed.
+    startingPosition.row -= Steps[invertedDirection].row;
+    startingPosition.column -= Steps[invertedDirection].column;
+
+    let pipes = 0;
+    const currentPosition = startingPosition;
+
+    while (!equalCoordinates(currentPosition, until)) {
+        if (grid[currentPosition.row][currentPosition.column] === pipeToCount)
+            pipes++;
+
+        currentPosition.row += Steps[walkingDirection].row;
+        currentPosition.column += Steps[walkingDirection].column;
+    }
+
+    return pipes;
+}
+
+function isInsideLoop(grid: Grid, tile: Coordinate): boolean {
+    const neighbors = getNeighbors(grid, tile);
+
+    if (neighbors.length != 4)
+        return false;
+
+    return neighbors.every((neighbor) => {
+        return countPipes(grid, neighbor.direction, tile) % 2 !== 0;
+    });
 }
 
 /*
@@ -497,5 +555,32 @@ export function solvePartOne(input: string): number {
  * area within the loop. **How many tiles are enclosed by the loop?**
 */
 export function solvePartTwo(input: string): number {
-    return 0;
+    const grid = parseInput(input);
+    const loop = findLoop(grid);
+
+    const loopOnly: Grid = grid.map((row) => Array.from(Tile.Ground.repeat(row.length)) as Tile[]);
+
+    loop.forEach((pipe) => {
+        loopOnly[pipe.coordinate.row][pipe.coordinate.column] = pipe.value;
+    })
+
+    const loopAreaGrid = grid.map((row) => Array.from(Tile.Ground.repeat(row.length)));
+
+    loop.forEach((pipe) => {
+        loopAreaGrid[pipe.coordinate.row][pipe.coordinate.column] = "X";
+    })
+
+    let insideCount = 0;
+
+    for (let row = 0; row < grid.length; row++) {
+        for (let column = 0; column < grid[0].length; column++) {
+            if (loopAreaGrid[row][column] === "X")
+                continue;
+
+            if (isInsideLoop(loopOnly, { row, column }))
+                insideCount++;
+        }
+    }
+
+    return insideCount;
 }
